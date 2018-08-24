@@ -20,22 +20,39 @@ public class Props {
     	propList = new PropList();
 	}
 	
-	public void saveProps() {
+	public String saveProps(String username, String password, String AC1, String AC2, String AC3, String TC1, String TC2, String TC3) {
 		    	
 		try {
 
 			output = new FileOutputStream("config.properties");
 			
-			// set the properties value
-			prop.setProperty("username", "user");
-			prop.setProperty("password", "pass");
-			prop.setProperty("chromeDriverPath", "path");
+			//Update the local property list to reflect changes
+			propList.setProp("username", username);
+			propList.setProp("password", password);
+			propList.setProp("AC1", AC1);
+			propList.setProp("AC2", AC2);
+			propList.setProp("AC3", AC3);
+			propList.setProp("TC1", TC1);
+			propList.setProp("TC2", TC2);
+			propList.setProp("TC3", TC3);
+			
+			//Update the config property list to reflect changes
+			prop.setProperty("username", this.propList.getProp("username"));
+			prop.setProperty("password", this.propList.getProp("password"));
+			prop.setProperty("AC1", this.propList.getProp("AC1"));
+			prop.setProperty("AC2", this.propList.getProp("AC2"));
+			prop.setProperty("AC3", this.propList.getProp("AC3"));
+			prop.setProperty("TC1", this.propList.getProp("TC1"));
+			prop.setProperty("TC2", this.propList.getProp("TC2"));
+			prop.setProperty("TC3", this.propList.getProp("TC3"));
 
-			// save properties to project root folder
 			prop.store(output, null);
-
+			
+			return "! Changes have been successfully saved ! \n";
+			
 		} catch (IOException io) {
 			io.printStackTrace();
+			return "! Saving changes has FAILED. Stack trace: " + io.getMessage() + "! \n";
 		} finally {
 			if (output != null) {
 				try {
@@ -59,9 +76,14 @@ public class Props {
 
 			propList.addProp("username", prop.getProperty("username"));
 			propList.addProp("password", prop.getProperty("password"));
-			propList.addProp("chromeDriverPath", prop.getProperty("chromeDriverPath"));
+			propList.addProp("AC1", prop.getProperty("AC1"));
+			propList.addProp("AC2", prop.getProperty("AC2"));
+			propList.addProp("AC3", prop.getProperty("AC3"));
+			propList.addProp("TC1", prop.getProperty("TC1"));
+			propList.addProp("TC2", prop.getProperty("TC2"));
+			propList.addProp("TC3", prop.getProperty("TC3"));			
 
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
 			if (input != null) {
@@ -97,6 +119,10 @@ public class Props {
 		
 		public String getProp(String propertyName) {
 			return this.propValues.get((propNames.indexOf(propertyName)));
+		}
+
+		public void setProp(String propertyName, String value) {
+			this.propValues.set(propNames.indexOf(propertyName), value);
 		}
 		
 	}

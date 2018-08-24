@@ -13,12 +13,12 @@ public class SeleniumHelper {
 	private String chromeDriverPath;
 	WebDriver driver;
 	
-	public SeleniumHelper(String username, String password, String chromeDriverPath) {
+	public SeleniumHelper(String username, String password) {
 		this.username = username;
 		this.password = password;
 		//Load the Chromedriver and set the system path for the chromedriver
 		this.chromeDriverPath = chromeDriverPath;
-		System.setProperty("webdriver.chrome.driver", this.chromeDriverPath);		
+		System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "/chromeDriver.exe");		
 		driver = new ChromeDriver();
 	}
 	
@@ -38,7 +38,7 @@ public class SeleniumHelper {
 		return this.password;
 	}
 	
-	public void signIn() {
+	public void signIn(String SignInUsername, String SignInPassword) {
 		
 		driver.get("https://wrem.sis.yorku.ca/Apps/WebObjects/REM.woa/wa/DirectAction/rem");
 		
@@ -46,8 +46,8 @@ public class SeleniumHelper {
 		WebElement username = driver.findElement(By.name("mli"));
 		WebElement password = driver.findElement(By.name("password"));
 		WebElement login = driver.findElement(By.name("dologin"));
-		username.sendKeys("Falador");
-		password.sendKeys("Thegame21");
+		username.sendKeys(SignInUsername);
+		password.sendKeys(SignInPassword);
 		login.click();
 		driver.get("https://wrem.sis.yorku.ca/Apps/WebObjects/REM.woa/wa/DirectAction/rem");
 		
@@ -56,98 +56,100 @@ public class SeleniumHelper {
 		WebElement academicSessionSubmit = driver.findElement(By.name("3.5.1.27.1.13"));
 		academicSession.selectByVisibleText("FALL/WINTER 2018-2019 UNDERGRADUATE STUDENTS");
 		academicSessionSubmit.click();
+				
+	}
+	
+	//TRANSFER SUCCESS 5.1.27.11.7
+	//ADD SUCCESS 5.1.27.19.7
+	public ArrayList<String> add(ArrayList<String> coursesToEnroll){
+		
+		ArrayList<String> resultMessages = new ArrayList<String>();
+		
+		for(int i = 0; i < coursesToEnroll.size(); i++) {
+			
+			if(coursesToEnroll.get(i).length() > 0) {
+				
+				//ADD COURSE 1
+				WebElement add = driver.findElement(By.name("5.1.27.1.23"));
+				add.click();
+	
+				//ADD COURSE 2
+				WebElement courseInput = driver.findElement(By.name("5.1.27.7.7"));
+				WebElement addCourse = driver.findElement(By.name("5.1.27.7.9"));
+				courseInput.sendKeys(coursesToEnroll.get(i));
+				addCourse.click();
+				
+				//ADD CONFIRM
+				WebElement addConfirm = driver.findElement(By.name("5.1.27.11.9"));
+				addConfirm.click();
+	
+				//TRANSFER RESULT
+				WebElement addResultSubmit = driver.findElement(By.name("5.1.27.27.9"));
+				boolean addResult = driver.getPageSource().contains("The course has not been added.");
+	
+				addResultSubmit.click();
+				
+				if(addResult)
+				{
+					resultMessages.add("! The course has not been added ! \n");
+				}
+				else {
+					resultMessages.add("! The course has been successfully added ! \n");
+				}
+			
+			}
+			
+		}
+
+	    driver.quit();
+		return resultMessages;
 		
 	}
 	
 	//TRANSFER SUCCESS 5.1.27.11.7
 	//ADD SUCCESS 5.1.27.19.7
-	public void add(ArrayList<String> coursesToEnroll){
+	public ArrayList<String> transfer(ArrayList<String> coursesToEnroll){
 		
+		ArrayList<String> resultMessages = new ArrayList<String>();
+
 		for(int i = 0; i < coursesToEnroll.size(); i++) {
 			
-			//ADD COURSE 1
-			WebElement add = driver.findElement(By.name("5.1.27.1.23"));
-			add.click();
-
-			//ADD COURSE 2
-			WebElement courseInput = driver.findElement(By.name("5.1.27.7.7"));
-			WebElement addCourse = driver.findElement(By.name("5.1.27.7.9"));
-			courseInput.sendKeys(coursesToEnroll.get(i));
-			addCourse.click();
-			
-			//ADD CONFIRM
-			WebElement addConfirm = driver.findElement(By.name("5.1.27.11.9"));
-			addConfirm.click();
-
-			//TRANSFER RESULT
-			WebElement addResultSubmit = driver.findElement(By.name("5.1.27.27.9"));
-			boolean addResult = driver.getPageSource().contains("The course has not been added.");
-
-			addResultSubmit.click();
-			
-			if(addResult)
-			{
-			    System.out.println("The course has not been added.");
-			}
-			else {
-			    System.out.println("The course has been successfully added!");
-			}
-			
-		}
-
-	    try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		driver.quit();
-		
-	}
+			if(coursesToEnroll.get(i).length() > 0) {
+				
+				//TRANSFER COURSE 1
+				WebElement transfer = driver.findElement(By.name("5.1.27.1.27"));
+				transfer.click();
 	
-	//TRANSFER SUCCESS 5.1.27.11.7
-	//ADD SUCCESS 5.1.27.19.7
-	public void transfer(ArrayList<String> coursesToEnroll){
-		
-		for(int i = 0; i < coursesToEnroll.size(); i++) {
-			
-			//TRANSFER COURSE 1
-			WebElement transfer = driver.findElement(By.name("5.1.27.1.27"));
-			transfer.click();
-
-			//TRANSFER COURSE 2
-			WebElement courseInput = driver.findElement(By.name("5.1.27.5.7"));
-			WebElement transferCourse = driver.findElement(By.name("5.1.27.5.9"));
-			courseInput.sendKeys(coursesToEnroll.get(i));
-			transferCourse.click();
-			
-			//TRANSFER CONFIRM
-			WebElement transferConfirm = driver.findElement(By.name("5.1.27.7.9"));
-			transferConfirm.click();
-
-			//TRANSFER RESULT
-			WebElement transferResultSubmit = driver.findElement(By.name("5.1.27.13.9"));
-			boolean transferResult = driver.getPageSource().contains("The course has not been transfered.");
-
-			transferResultSubmit.click();
-			
-			if(transferResult)
-			{
-			    System.out.println("The course has not been transfered.");
-			}
-			else {
-			    System.out.println("The course has been successfully transferred!");
+				//TRANSFER COURSE 2
+				WebElement courseInput = driver.findElement(By.name("5.1.27.5.7"));
+				WebElement transferCourse = driver.findElement(By.name("5.1.27.5.9"));
+				courseInput.sendKeys(coursesToEnroll.get(i));
+				transferCourse.click();
+				
+				//TRANSFER CONFIRM
+				WebElement transferConfirm = driver.findElement(By.name("5.1.27.7.9"));
+				transferConfirm.click();
+	
+				//TRANSFER RESULT
+				WebElement transferResultSubmit = driver.findElement(By.name("5.1.27.13.9"));
+				boolean transferResult = driver.getPageSource().contains("The course has not been transfered.");
+	
+				transferResultSubmit.click();
+				
+				if(transferResult)
+				{
+					resultMessages.add("! The course has not been transferred ! \n");
+				}
+				else {
+					resultMessages.add("! The course has been successfully transferred ! \n");
+				}
+				
 			}
 			
 		}
 
-	    try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		driver.quit();
+		return resultMessages;
 		
 	}
 	
