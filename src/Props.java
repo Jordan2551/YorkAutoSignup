@@ -20,7 +20,7 @@ public class Props {
     	propList = new PropList();
 	}
 	
-	public String saveProps(String username, String password, String AC1, String AC2, String AC3, String TC1, String TC2, String TC3) {
+	public String saveProps(String username, String password , String enableWindowlessSignup, String autoSignupTime, String AC1, String AC2, String AC3, String TC1, String TC2, String TC3) {
 		    	
 		try {
 
@@ -29,16 +29,20 @@ public class Props {
 			//Update the local property list to reflect changes
 			propList.setProp("username", username);
 			propList.setProp("password", password);
+			propList.setProp("enableWindowlessSignup", enableWindowlessSignup);
+			propList.setProp("autoSignupTime", autoSignupTime);
 			propList.setProp("AC1", AC1);
 			propList.setProp("AC2", AC2);
 			propList.setProp("AC3", AC3);
 			propList.setProp("TC1", TC1);
 			propList.setProp("TC2", TC2);
 			propList.setProp("TC3", TC3);
-			
+
 			//Update the config property list to reflect changes
 			prop.setProperty("username", this.propList.getProp("username"));
 			prop.setProperty("password", this.propList.getProp("password"));
+			prop.setProperty("enableWindowlessSignup", this.propList.getProp("enableWindowlessSignup"));
+			prop.setProperty("autoSignupTime", this.propList.getProp("autoSignupTime"));
 			prop.setProperty("AC1", this.propList.getProp("AC1"));
 			prop.setProperty("AC2", this.propList.getProp("AC2"));
 			prop.setProperty("AC3", this.propList.getProp("AC3"));
@@ -76,6 +80,8 @@ public class Props {
 
 			propList.addProp("username", prop.getProperty("username"));
 			propList.addProp("password", prop.getProperty("password"));
+			propList.addProp("enableWindowlessSignup", prop.getProperty("enableWindowlessSignup"));
+			propList.addProp("autoSignupTime", prop.getProperty("autoSignupTime"));
 			propList.addProp("AC1", prop.getProperty("AC1"));
 			propList.addProp("AC2", prop.getProperty("AC2"));
 			propList.addProp("AC3", prop.getProperty("AC3"));
@@ -101,6 +107,21 @@ public class Props {
 		return this.propList;
 	}
 	
+	public static String getCheckBoxState(boolean state) {
+		return state ? "true" : "false"; 
+	}
+	
+	public static boolean getCheckBoxState(String state) {
+		return state != null && state.equals("true") ? true : false; 
+	}
+	
+	public static long getNumber(String value) {
+		try{
+			return Long.valueOf(value);
+		}catch(NumberFormatException e) {
+			return -1;
+		}
+	}
 	
 	class PropList {
 		

@@ -5,15 +5,24 @@ import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.JCheckBox;
+import javax.swing.JSeparator;
+import javax.swing.JRadioButton;
+import javax.swing.JRadioButtonMenuItem;
 
 public class GUI {
 
@@ -22,6 +31,9 @@ public class GUI {
 	private JTextField username;
 	private JPasswordField password;
 	private TextArea consoleMessages;
+	private JCheckBox enableWindowlessSignup;
+	private JRadioButton rdbtnAddCourse;
+	private Timer autoSignupTimer;
 	private JTextField AC1;
 	private JTextField AC2;
 	private JTextField AC3;
@@ -32,6 +44,7 @@ public class GUI {
 	private static SeleniumHelper seleniumHelper;
 	private static Props props;
 	private static ArrayList<String> coursesToEnroll;
+	private JTextField signupEvery;
 
 
 	public static void main(String[] args) {
@@ -61,12 +74,12 @@ public class GUI {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 600, 750);
+		frame.setBounds(100, 100, 600, 900);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		JLabel lblDevelopedWith = new JLabel("Developed with <3 by JC Software");
-		lblDevelopedWith.setBounds(69, 687, 432, 16);
+		lblDevelopedWith.setBounds(69, 835, 432, 16);
 		lblDevelopedWith.setHorizontalAlignment(SwingConstants.CENTER);
 		lblDevelopedWith.setForeground(Color.blue);
 		frame.getContentPane().add(lblDevelopedWith);
@@ -74,47 +87,19 @@ public class GUI {
 		JButton btnAddCourse = new JButton("Add Course");
 		btnAddCourse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				consoleMessages.setText(consoleMessages.getText() + "! Automatic course add started... ! \n");
-				
-				coursesToEnroll = new ArrayList<String>();
-				coursesToEnroll.add(AC1.getText());
-				coursesToEnroll.add(AC2.getText());
-				coursesToEnroll.add(AC3.getText());
-				seleniumHelper = new SeleniumHelper(props.getPropList().getProp("username"), props.getPropList().getProp("password"));
-				seleniumHelper.signIn(username.getText(), password.getText());
-				consoleMessages.setText(consoleMessages.getText() + "! Login to Passport York was successful ! \n");
-				ArrayList<String> resultMessages = seleniumHelper.add(coursesToEnroll);
-				for(int i = 0; i < resultMessages.size(); i++) {
-					consoleMessages.setText(consoleMessages.getText() + resultMessages.get(i));
-				}
-					
+				startAddCourse();			
 			}
 		});
 		btnAddCourse.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		btnAddCourse.setBounds(106, 204, 150, 83);
+		btnAddCourse.setBounds(106, 358, 150, 83);
 		frame.getContentPane().add(btnAddCourse);
 		
 		JButton btnTransferCourse = new JButton("Transfer Course");
 		btnTransferCourse.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		btnTransferCourse.setBounds(317, 204, 150, 83);
+		btnTransferCourse.setBounds(317, 358, 150, 83);
 		btnTransferCourse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				consoleMessages.setText(consoleMessages.getText() + "! Automatic course transfer started... ! \n");
-				
-				coursesToEnroll = new ArrayList<String>();
-				coursesToEnroll.add(TC1.getText());
-				coursesToEnroll.add(TC2.getText());
-				coursesToEnroll.add(TC3.getText());
-				seleniumHelper = new SeleniumHelper(props.getPropList().getProp("username"), props.getPropList().getProp("password"));
-				seleniumHelper.signIn(username.getText(), password.getText());
-				consoleMessages.setText(consoleMessages.getText() + "! Login to Passport York was successful ! \n");
-				ArrayList<String> resultMessages = seleniumHelper.transfer(coursesToEnroll);
-				for(int i = 0; i < resultMessages.size(); i++) {
-					consoleMessages.setText(consoleMessages.getText() + resultMessages.get(i));
-				}
-				
+				startTransferCourse();				
 			}
 		});
 		frame.getContentPane().add(btnTransferCourse);
@@ -144,63 +129,63 @@ public class GUI {
 		frame.getContentPane().add(password);
 		
 		JLabel lblCourse = new JLabel("Course #1:");
-		lblCourse.setBounds(90, 327, 88, 16);
+		lblCourse.setBounds(90, 481, 88, 16);
 		frame.getContentPane().add(lblCourse);
 		
 		AC1 = new JTextField();
 		AC1.setColumns(10);
-		AC1.setBounds(162, 324, 103, 22);
+		AC1.setBounds(162, 478, 103, 22);
 		frame.getContentPane().add(AC1);
 		
 		AC2 = new JTextField();
 		AC2.setColumns(10);
-		AC2.setBounds(162, 356, 103, 22);
+		AC2.setBounds(162, 510, 103, 22);
 		frame.getContentPane().add(AC2);
 		
 		JLabel lblCourse_2 = new JLabel("Course #2:");
-		lblCourse_2.setBounds(90, 359, 88, 16);
+		lblCourse_2.setBounds(90, 513, 88, 16);
 		frame.getContentPane().add(lblCourse_2);
 		
 		AC3 = new JTextField();
 		AC3.setColumns(10);
-		AC3.setBounds(162, 388, 103, 22);
+		AC3.setBounds(162, 542, 103, 22);
 		frame.getContentPane().add(AC3);
 		
 		JLabel lblCourse_1 = new JLabel("Course #3:");
-		lblCourse_1.setBounds(90, 391, 88, 16);
+		lblCourse_1.setBounds(90, 545, 88, 16);
 		frame.getContentPane().add(lblCourse_1);
 		
 		TC1 = new JTextField();
 		TC1.setColumns(10);
-		TC1.setBounds(380, 324, 103, 22);
+		TC1.setBounds(380, 478, 103, 22);
 		frame.getContentPane().add(TC1);
 		
 		JLabel label = new JLabel("Course #1:");
-		label.setBounds(308, 327, 88, 16);
+		label.setBounds(308, 481, 88, 16);
 		frame.getContentPane().add(label);
 		
 		JLabel label_1 = new JLabel("Course #2:");
-		label_1.setBounds(308, 359, 88, 16);
+		label_1.setBounds(308, 513, 88, 16);
 		frame.getContentPane().add(label_1);
 		
 		TC2 = new JTextField();
 		TC2.setColumns(10);
-		TC2.setBounds(380, 356, 103, 22);
+		TC2.setBounds(380, 510, 103, 22);
 		frame.getContentPane().add(TC2);
 		
 		JLabel label_2 = new JLabel("Course #3:");
-		label_2.setBounds(308, 391, 88, 16);
+		label_2.setBounds(308, 545, 88, 16);
 		frame.getContentPane().add(label_2);
 		
 		TC3 = new JTextField();
 		TC3.setColumns(10);
-		TC3.setBounds(380, 388, 103, 22);
+		TC3.setBounds(380, 542, 103, 22);
 		frame.getContentPane().add(TC3);
 		
 		JLabel lblMsgs = new JLabel("Console Log:");
 		lblMsgs.setForeground(new Color(255, 0, 0));
 		lblMsgs.setFont(new Font("Tahoma", Font.BOLD, 13));
-		lblMsgs.setBounds(233, 516, 88, 16);
+		lblMsgs.setBounds(233, 670, 88, 16);
 		frame.getContentPane().add(lblMsgs);
 		
 		Box verticalBox = Box.createVerticalBox();
@@ -209,7 +194,7 @@ public class GUI {
 		frame.getContentPane().add(verticalBox);
 		
 		JLabel lblWhatWouldYou = new JLabel("What would you like to do?");
-		lblWhatWouldYou.setBounds(180, 144, 194, 20);
+		lblWhatWouldYou.setBounds(185, 318, 194, 20);
 		frame.getContentPane().add(lblWhatWouldYou);
 		lblWhatWouldYou.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWhatWouldYou.setForeground(new Color(0, 0, 128));
@@ -217,7 +202,7 @@ public class GUI {
 		
 		consoleMessages = new TextArea();
 		consoleMessages.setFont(new Font("Dialog", Font.BOLD, 14));
-		consoleMessages.setBounds(51, 538, 468, 107);
+		consoleMessages.setBounds(51, 692, 468, 107);
 		frame.getContentPane().add(consoleMessages);
 		
 		JButton saveButton = new JButton("Save Changes");
@@ -227,14 +212,8 @@ public class GUI {
 			}
 		});
 		saveButton.setFont(new Font("Tahoma", Font.PLAIN, 16));
-		saveButton.setBounds(219, 443, 137, 44);
+		saveButton.setBounds(219, 597, 137, 44);
 		frame.getContentPane().add(saveButton);
-		
-		Box verticalBox_1 = Box.createVerticalBox();
-		verticalBox_1.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
-		verticalBox_1.setBounds(39, 133, 490, 541);
-		frame.getContentPane().add(verticalBox_1);
-		
 		
 		//Get properties from config file and populate the appropriate fields
 		props = new Props();	
@@ -247,12 +226,129 @@ public class GUI {
 		TC1.setText(props.getPropList().getProp("TC1"));
 		TC2.setText(props.getPropList().getProp("TC2"));
 		TC3.setText(props.getPropList().getProp("TC3"));
+		
+		JLabel snt = new JLabel("Sign Up Every (minutes):");
+		snt.setBounds(140, 182, 150, 16);
+		frame.getContentPane().add(snt);
+
+		signupEvery = new JTextField();
+		signupEvery.setColumns(10);
+		signupEvery.setBounds(293, 179, 116, 22);
+		frame.getContentPane().add(signupEvery);
+		signupEvery.setText(props.getPropList().getProp("autoSignupTime"));
+		
+		enableWindowlessSignup = new JCheckBox("Enable Windowless Signup");
+		enableWindowlessSignup.setBounds(197, 145, 181, 25);
+		frame.getContentPane().add(enableWindowlessSignup);
+		enableWindowlessSignup.setSelected(Props.getCheckBoxState(props.getPropList().getProp("enableWindowlessSignup")));
+		
+		JButton startTimedSignup = new JButton("Start ");
+		startTimedSignup.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {	
+				int randomRange = new Random().nextInt(92110 - 10000) + 10000;
+				long signupTime = Props.getNumber(signupEvery.getText());
+				autoSignupTimer = new Timer();
+				autoSignupTimer.scheduleAtFixedRate(new AutoSignupTimerTask(rdbtnAddCourse.isSelected()), 1000,  signupTime != -1 ? (signupTime * 60000) + randomRange  : 900000);//Default time (for incorrect input is 15 minutes)
+				consoleMessages.setText(consoleMessages.getText() + "! Automatic signup has started. Your signup will begin in " + signupTime  + " minutes from now ! \n");
+			}
+		});
+		startTimedSignup.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		startTimedSignup.setBounds(128, 248, 137, 29);
+		frame.getContentPane().add(startTimedSignup);
+		
+		JButton stopAutoSignup = new JButton("Stop");
+		stopAutoSignup.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				autoSignupTimer.cancel();
+				consoleMessages.setText(consoleMessages.getText() + "! Automatic signup has stopped ! \n");
+			}
+		});
+		stopAutoSignup.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		stopAutoSignup.setBounds(277, 248, 137, 29);
+		frame.getContentPane().add(stopAutoSignup);
+		
+		rdbtnAddCourse = new JRadioButton("Add Course");
+		rdbtnAddCourse.setSelected(true);
+		rdbtnAddCourse.setBounds(159, 214, 106, 25);
+		frame.getContentPane().add(rdbtnAddCourse);
+		
+		JRadioButton rdbtnTransferCourse = new JRadioButton("Transfer Course");
+		rdbtnTransferCourse.setBounds(269, 214, 127, 25);
+		frame.getContentPane().add(rdbtnTransferCourse);
+		
+		ButtonGroup autoSignupGroup = new ButtonGroup();
+		autoSignupGroup.add(rdbtnAddCourse);
+		autoSignupGroup.add(rdbtnTransferCourse);
+		
+		Box verticalBox_1 = Box.createVerticalBox();
+		verticalBox_1.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
+		verticalBox_1.setBounds(39, 132, 490, 161);
+		frame.getContentPane().add(verticalBox_1);
+		
+		Box verticalBox_2 = Box.createVerticalBox();
+		verticalBox_2.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
+		verticalBox_2.setBounds(39, 307, 490, 515);
+		frame.getContentPane().add(verticalBox_2);
 
 	}
 	
-	public void saveChanges() {
-		consoleMessages.setText(consoleMessages.getText() + props.saveProps(username.getText(), password.getText(),AC1.getText(), AC2.getText(), AC3.getText(), TC1.getText(), TC2.getText(), TC3.getText()));
+	private void startAddCourse() {
+		
+		consoleMessages.setText(consoleMessages.getText() + "! Automatic course add started... ! \n");
+		coursesToEnroll = new ArrayList<String>();
+		coursesToEnroll.add(AC1.getText());
+		coursesToEnroll.add(AC2.getText());
+		coursesToEnroll.add(AC3.getText());
+		seleniumHelper = new SeleniumHelper(props.getPropList().getProp("username"), props.getPropList().getProp("password"), enableWindowlessSignup.isSelected());
+		seleniumHelper.signIn(username.getText(), password.getText());
+		consoleMessages.setText(consoleMessages.getText() + "! Login to Passport York was successful ! \n");
+		ArrayList<String> resultMessages = seleniumHelper.add(coursesToEnroll);
+		for(int i = 0; i < resultMessages.size(); i++) {
+			consoleMessages.setText(consoleMessages.getText() + resultMessages.get(i));
+		}
+		
+	}
+	
+	private void startTransferCourse() {
+		
+		consoleMessages.setText(consoleMessages.getText() + "! Automatic course transfer started... ! \n");
+		coursesToEnroll = new ArrayList<String>();
+		coursesToEnroll.add(TC1.getText());
+		coursesToEnroll.add(TC2.getText());
+		coursesToEnroll.add(TC3.getText());
+		seleniumHelper = new SeleniumHelper(props.getPropList().getProp("username"), props.getPropList().getProp("password"), enableWindowlessSignup.isSelected());
+		seleniumHelper.signIn(username.getText(), password.getText());
+		consoleMessages.setText(consoleMessages.getText() + "! Login to Passport York was successful ! \n");
+		ArrayList<String> resultMessages = seleniumHelper.transfer(coursesToEnroll);
+		for(int i = 0; i < resultMessages.size(); i++) {
+			consoleMessages.setText(consoleMessages.getText() + resultMessages.get(i));
+		}
+
 	}
 	
 	
+	public void saveChanges() {
+		consoleMessages.setText(consoleMessages.getText() + props.saveProps(username.getText(), password.getText(), Props.getCheckBoxState(enableWindowlessSignup.isSelected()), signupEvery.getText(), AC1.getText(), AC2.getText(), AC3.getText(), TC1.getText(), TC2.getText(), TC3.getText()));
+	}
+	
+	public class AutoSignupTimerTask extends TimerTask {
+		
+		boolean addCourses;
+		
+		public AutoSignupTimerTask(boolean addCourses) {
+			super();
+			this.addCourses = addCourses;
+		}
+		
+		@Override
+		public void run() {
+			if(addCourses)
+				startAddCourse();
+			else
+				startTransferCourse();
+		}
+	}
+	
 }
+
+

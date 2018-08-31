@@ -1,9 +1,12 @@
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Select;
 
 public class SeleniumHelper {
@@ -13,13 +16,17 @@ public class SeleniumHelper {
 	private String chromeDriverPath;
 	WebDriver driver;
 	
-	public SeleniumHelper(String username, String password) {
+	public SeleniumHelper(String username, String password, boolean enabledWindowlessSignup) {
 		this.username = username;
 		this.password = password;
 		//Load the Chromedriver and set the system path for the chromedriver
 		this.chromeDriverPath = chromeDriverPath;
+		ChromeOptions options = new ChromeOptions();
+		if(enabledWindowlessSignup) {
+			options.addArguments("--headless");
+		}
 		System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir") + "/chromeDriver.exe");		
-		driver = new ChromeDriver();
+		driver = new ChromeDriver(options);
 	}
 	
 	public void setUsername(String username) {
@@ -92,9 +99,11 @@ public class SeleniumHelper {
 				if(addResult)
 				{
 					resultMessages.add("! The course has not been added ! \n");
+
 				}
 				else {
 					resultMessages.add("! The course has been successfully added ! \n");
+				    JOptionPane.showMessageDialog(null, "Course has been successfully added!");
 				}
 			
 			}
@@ -142,6 +151,7 @@ public class SeleniumHelper {
 				}
 				else {
 					resultMessages.add("! The course has been successfully transferred ! \n");
+				    JOptionPane.showMessageDialog(null, "Course has been successfully transferrerd!");
 				}
 				
 			}
